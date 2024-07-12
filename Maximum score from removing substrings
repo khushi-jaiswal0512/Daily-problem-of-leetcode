@@ -1,0 +1,51 @@
+import java.util.Stack;
+
+public class Solution {
+    public int maximumGain(String s, int x, int y) {
+        if (x < y) {
+            return calculatePoints(s, y, x, 'b', 'a');
+        } else {
+            return calculatePoints(s, x, y, 'a', 'b');
+        }
+    }
+
+    private int calculatePoints(String s, int firstValue, int secondValue, char firstChar, char secondChar) {
+        Stack<Character> stack = new Stack<>();
+        int points = 0;
+
+        // First pass to remove higher scoring substrings
+        for (char ch : s.toCharArray()) {
+            if (ch == secondChar && !stack.isEmpty() && stack.peek() == firstChar) {
+                stack.pop();
+                points += firstValue;
+            } else {
+                stack.push(ch);
+            }
+        }
+
+        // Rebuild the string from stack for the second pass
+        StringBuilder remaining = new StringBuilder();
+        while (!stack.isEmpty()) {
+            remaining.insert(0, stack.pop());
+        }
+
+        // Second pass to remove the lower scoring substrings
+        for (char ch : remaining.toString().toCharArray()) {
+            if (ch == firstChar && !stack.isEmpty() && stack.peek() == secondChar) {
+                stack.pop();
+                points += secondValue;
+            } else {
+                stack.push(ch);
+            }
+        }
+
+        return points;
+    }
+
+    public static void main(String[] args) {
+        Solution solution = new Solution();
+        System.out.println(solution.maximumGain("cdbcbbaaabab", 4, 5)); // Output: 19
+        System.out.println(solution.maximumGain("aabbaaxybbaabb", 5, 4)); // Output: 20
+        System.out.println(solution.maximumGain("cbaabwbbbabbwaaq", 4074, 9819)); // Output: 23712
+    }
+}
